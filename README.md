@@ -41,7 +41,8 @@ $ stack run systemF
 #### Examples:
 
 ```
-a b c (d e f g) h i
+[enter λ expression]
+:$ a b c (d e f g) h i
 ```
 
 ```
