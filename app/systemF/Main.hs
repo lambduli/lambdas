@@ -7,7 +7,7 @@ import SystemF.Parser (expression, typeAnnotation)
 import SystemF.AST (Expression(..))
 import SystemF.Evaluator (normalize, normalStep)
 import SystemF.Types (Type(..))
--- import SystemF.TypeChecker (typeOf)
+import SystemF.TypeChecker (typeOf)
 
 main :: IO ()
 main = do
@@ -18,19 +18,24 @@ main = do
 
 execCommand :: Expression -> IO ()
 execCommand exp = do
-  putStr ":: $ "
+  putStr $ unwrapType (typeOf exp) ++ " :: $ "
   hFlush stdout
   print exp
-  cmnd <- prompt "[command]:$ "
+  cmnd <- prompt "[command or expression]:$ "
   case cmnd of
     ":step" -> execCommand $ normalStep exp
     ":normalize" -> execCommand $ normalize exp
     ":new" -> main
     ":bye" -> return ()
+    _ -> execCommand $ fst $ last $ readP_to_S expression cmnd
 
-unwrap :: Maybe a -> a
-unwrap (Just a) = a
+unwrapType :: Either Type String -> String
+unwrapType (Left t) = "[" ++ show t ++ "]"
+unwrapType (Right e) = "[" ++ e ++ "]"
 
+-- (/ A . (\ a : A -> A . (\ b : A . a (a b)))) [Nat] ((/ E . (\ i : E . i)) [Nat]) 23
+-- (/ A . (\ a : A -> A . (\ b : A . a (a b)))) [Nat] (\ i : Nat . i) 23
+-- (/ A . (\ a : A -> A . (\ b : A . a b))) [Nat] (\ i : Nat . i) 23
 
 prompt :: String -> IO (String)
 prompt msg = do

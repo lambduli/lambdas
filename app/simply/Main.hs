@@ -18,19 +18,20 @@ main = do
 
 execCommand :: Expression -> IO ()
 execCommand exp = do
-  putStr $ (unwrapType $ typeOf exp) ++ " :: $ "
+  putStr $ unwrapType (typeOf exp) ++ " :: $ "
   hFlush stdout
   print exp
-  cmnd <- prompt "[command]:$ "
+  cmnd <- prompt "[command or expression]:$ "
   case cmnd of
     ":step" -> execCommand $ normalStep exp
     ":normalize" -> execCommand $ normalize exp
     ":new" -> main
     ":bye" -> return ()
+    _ -> execCommand $ fst $ last $ readP_to_S expression cmnd
 
-unwrapType :: (Show a) => Maybe a -> String
-unwrapType (Just a) = "[" ++ show a ++ "]"
-unwrapType Nothing = "[type uknown]"
+unwrapType :: Either Type String -> String
+unwrapType (Left t) = "[" ++ show t ++ "]"
+unwrapType (Right e) = "[" ++ e ++ "]"
 
 prompt :: String -> IO (String)
 prompt msg = do

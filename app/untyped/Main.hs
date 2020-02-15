@@ -19,12 +19,13 @@ execCommand exp = do
   putStr ":$ "
   hFlush stdout
   print exp
-  cmnd <- prompt "[command]:$ "
+  cmnd <- prompt "[command or expression]:$ "
   case cmnd of
     ":step" -> execCommand $ normalStep exp
     ":normalize" -> execCommand $ normalize exp
     ":new" -> main
     ":bye" -> return ()
+    _ -> execCommand $ fst $ last $ readP_to_S expression cmnd
 
 unwrap :: Maybe a -> a
 unwrap (Just a) = a
