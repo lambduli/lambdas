@@ -3,7 +3,7 @@ module Simply.TypeChecker where
 import qualified Simply.AST as AST
 import qualified Simply.Types as Type
 
-type Env = [(String, Type.Type)]
+type Context = [(String, Type.Type)]
 
 typeOfTerm :: String -> Maybe Type.Type
 -- TODO: more of them later?
@@ -12,19 +12,19 @@ typeOfTerm "T" = Just Type.Boolean
 typeOfTerm "F" = Just Type.Boolean
 typeOfTerm _ = Nothing
 
-addType :: String -> Type.Type -> Env -> Env
-addType name t env = (name, t) : env
+addType :: String -> Type.Type -> Context -> Context
+addType name t ctx = (name, t) : ctx
 
-getType :: String -> Env -> Maybe Type.Type
+getType :: String -> Context -> Maybe Type.Type
 getType _ [] = Nothing
-getType name ((varName, t) : env)
+getType name ((varName, t) : ctx)
   | name == varName = Just t
-  | otherwise = getType name env
+  | otherwise = getType name ctx
 
 typeOf :: AST.Expression -> Maybe Type.Type
 typeOf ast = _typeOf ast []
 
-_typeOf :: AST.Expression -> Env -> Maybe Type.Type
+_typeOf :: AST.Expression -> Context -> Maybe Type.Type
 _typeOf (AST.Natural n) _ = Just Type.Nat
 _typeOf (AST.Boolean b) _ = Just Type.Boolean
 _typeOf (AST.Operator op) _ = typeOfTerm op
