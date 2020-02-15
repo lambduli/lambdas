@@ -3,14 +3,15 @@ module SystemF.AST where
 import Data.Set (Set)
 import qualified Data.Set as Set
 
-import qualified SystemF.Types as Type
+import qualified SystemF.Types as T
+
 
 data Expression
   = Variable String
   | TypeAbstraction String Expression
-  | Abstraction String Type.Type Expression
+  | Abstraction String T.Type Expression
   | Application Expression Expression
-  | TypeApplication Expression Type.Type
+  | TypeApplication Expression T.Type
   | Natural Int
   | Macro String
   | Operator String

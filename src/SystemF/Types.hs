@@ -1,5 +1,6 @@
 module SystemF.Types where
 
+
 data Type
   = Parameter String
   | ForAll String Type

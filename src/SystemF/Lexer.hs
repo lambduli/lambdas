@@ -5,6 +5,7 @@ import Text.ParserCombinators.ReadP
 
 import SystemF.Tokens
 
+
 isSimpleOperator :: Char -> Bool
 isSimpleOperator char =
   any (char ==) "=+-*/%^!"

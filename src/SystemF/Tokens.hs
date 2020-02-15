@@ -1,5 +1,6 @@
 module SystemF.Tokens where
 
+
 data Token
   = Identifier String
   | TypeVar String

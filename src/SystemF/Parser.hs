@@ -3,9 +3,10 @@ module SystemF.Parser where
 import Text.ParserCombinators.ReadP
 
 import qualified SystemF.AST as AST
-import qualified SystemF.Types as Type
+import qualified SystemF.Types as T
 import SystemF.Tokens
 import SystemF.Lexer
+
 
 -- Type := Var
 --       | (Type -> Type)
@@ -13,37 +14,37 @@ import SystemF.Lexer
 --       | (Type -> Type [-> Type])
 -- TODO: need to expand
 
-tVar :: ReadP Type.Type
+tVar :: ReadP T.Type
 tVar = do
   space <- skipSpaces
   p <- typeVar
-  case p of TypeVar t -> return $ Type.Parameter t
+  case p of TypeVar t -> return $ T.Parameter t
 
-tNat :: ReadP Type.Type
+tNat :: ReadP T.Type
 tNat = do
   space <- skipSpaces
   string "Nat"
-  return Type.Nat
+  return T.Nat
 
-tBool :: ReadP Type.Type
+tBool :: ReadP T.Type
 tBool = do
   space <- skipSpaces
   string "Bool"
-  return Type.Boolean
+  return T.Boolean
 
-leftPart :: ReadP Type.Type
+leftPart :: ReadP T.Type
 leftPart = do
   left <- choice [tVar, tNat, tBool, wrapTArr]
   space <- skipSpaces
   arrow <- arr
   return $ left
 
-tArr :: ReadP Type.Type
+tArr :: ReadP T.Type
 tArr = do
   tps <- many1 $ choice [leftPart, tVar, tNat, tBool, wrapTArr] -- ...leftPart : one of the others : []
-  return $ foldr (\tx ta -> Type.Arr tx ta) (last tps) (init tps)
+  return $ foldr (\tx ta -> T.Arr tx ta) (last tps) (init tps)
 
-wrapTArr :: ReadP Type.Type
+wrapTArr :: ReadP T.Type
 wrapTArr = do
   s <- skipSpaces
   l <- leftParen
@@ -52,7 +53,7 @@ wrapTArr = do
   r <- rightParen
   return arr
 
-typeAnnotation :: ReadP Type.Type
+typeAnnotation :: ReadP T.Type
 typeAnnotation =
   choice [tVar, tNat, tBool, wrapTArr, tArr]
   
@@ -65,7 +66,7 @@ typeAnnotation =
 --      | (EXP)
 -- TODO: need to expand
 
-typeParameter :: ReadP Type.Type
+typeParameter :: ReadP T.Type
 typeParameter = do
   space <- skipSpaces
   l <- leftBracket
@@ -114,14 +115,14 @@ operator' = do
 
 data Argument
   = Ex AST.Expression
-  | Tp Type.Type
+  | Tp T.Type
 
 wrap :: ReadP AST.Expression -> ReadP Argument
 wrap reader = do
   ex <- reader
   return $ Ex ex
 
-wrap' :: ReadP Type.Type -> ReadP Argument
+wrap' :: ReadP T.Type -> ReadP Argument
 wrap' reader = do
   tp <- reader
   return $ Tp tp
