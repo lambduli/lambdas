@@ -1,5 +1,6 @@
 module Simply.Types where
 
+
 data Type
   = Var
   | Arr Type Type

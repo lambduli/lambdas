@@ -1,5 +1,6 @@
 module Simply.Tokens where
 
+
 data Token
   = Identifier String
   | Dot

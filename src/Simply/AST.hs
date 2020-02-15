@@ -1,13 +1,11 @@
 module Simply.AST where
 
-import Data.Set (Set)
-import qualified Data.Set as Set
+import qualified Simply.Types as T
 
-import qualified Simply.Types as Type
 
 data Expression
   = Variable String
-  | Abstraction String Type.Type Expression
+  | Abstraction String T.Type Expression
   | Application Expression Expression
   | Natural Int
   | Macro String

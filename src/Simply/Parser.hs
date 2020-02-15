@@ -3,40 +3,41 @@ module Simply.Parser where
 import Text.ParserCombinators.ReadP
 
 import qualified Simply.AST as AST
-import qualified Simply.Types as Type
+import qualified Simply.Types as T
 import Simply.Tokens
 import Simply.Lexer
+
 
 -- Type := Var
 --       | (Type -> Type)
 --       | Type -> Type [-> Type]
 --       | (Type -> Type [-> Type])
 
-tNat :: ReadP Type.Type
+tNat :: ReadP T.Type
 tNat = do
   space <- skipSpaces
   string "Nat"
-  return Type.Nat
+  return T.Nat
 
-tBool :: ReadP Type.Type
+tBool :: ReadP T.Type
 tBool = do
   space <- skipSpaces
   string "Bool"
-  return Type.Boolean
+  return T.Boolean
 
-leftPart :: ReadP Type.Type
+leftPart :: ReadP T.Type
 leftPart = do
   left <- choice [tNat, tBool, wrapTArr]
   space <- skipSpaces
   arrow <- arr
   return $ left
 
-tArr :: ReadP Type.Type
+tArr :: ReadP T.Type
 tArr = do
   tps <- many1 $ choice [leftPart, tNat, tBool, wrapTArr] -- ...leftPart : one of the others : []
-  return $ foldr (\tx ta -> Type.Arr tx ta) (last tps) (init tps)
+  return $ foldr (\tx ta -> T.Arr tx ta) (last tps) (init tps)
 
-wrapTArr :: ReadP Type.Type
+wrapTArr :: ReadP T.Type
 wrapTArr = do
   s <- skipSpaces
   l <- leftParen
@@ -45,7 +46,7 @@ wrapTArr = do
   r <- rightParen
   return arr
 
-typeAnnotation :: ReadP Type.Type
+typeAnnotation :: ReadP T.Type
 typeAnnotation =
   choice [tNat, tBool, wrapTArr, tArr]
   
