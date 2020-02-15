@@ -5,42 +5,42 @@ import qualified Simply.Types as Type
 
 type Context = [(String, Type.Type)]
 
-typeOfTerm :: String -> Maybe Type.Type
+typeOfTerm :: String -> Either Type.Type String
 -- TODO: more of them later?
-typeOfTerm "+" = Just $ Type.Arr Type.Nat (Type.Arr Type.Nat Type.Nat)
-typeOfTerm "T" = Just Type.Boolean
-typeOfTerm "F" = Just Type.Boolean
-typeOfTerm _ = Nothing
+typeOfTerm "+" = Left $ Type.Arr Type.Nat (Type.Arr Type.Nat Type.Nat)
+typeOfTerm "T" = Left Type.Boolean
+typeOfTerm "F" = Left Type.Boolean
+typeOfTerm _ = Right "Term has no type."
 
 addType :: String -> Type.Type -> Context -> Context
 addType name t ctx = (name, t) : ctx
 
-getType :: String -> Context -> Maybe Type.Type
-getType _ [] = Nothing
+getType :: String -> Context -> Either Type.Type String
+getType _ [] = Right "Free Variable has unknown type."
 getType name ((varName, t) : ctx)
-  | name == varName = Just t
+  | name == varName = Left t
   | otherwise = getType name ctx
 
-typeOf :: AST.Expression -> Maybe Type.Type
-typeOf ast = _typeOf ast []
+typeOf :: AST.Expression -> Either Type.Type String
+typeOf ast = typeOf' ast []
 
-_typeOf :: AST.Expression -> Context -> Maybe Type.Type
-_typeOf (AST.Natural n) _ = Just Type.Nat
-_typeOf (AST.Boolean b) _ = Just Type.Boolean
-_typeOf (AST.Operator op) _ = typeOfTerm op
-_typeOf (AST.Macro t) _ = typeOfTerm t
-_typeOf (AST.Variable v) env = getType v env
-_typeOf (AST.Abstraction arg t body) env =
+typeOf' :: AST.Expression -> Context -> Either Type.Type String
+typeOf' (AST.Natural n) _ = Left Type.Nat
+typeOf' (AST.Boolean b) _ = Left Type.Boolean
+typeOf' (AST.Operator op) _ = typeOfTerm op
+typeOf' (AST.Macro t) _ = typeOfTerm t
+typeOf' (AST.Variable v) env = getType v env
+typeOf' (AST.Abstraction arg t body) env =
   let newEnv = addType arg t env
-      bodyt  = _typeOf body newEnv in
+      bodyt  = typeOf' body newEnv in
       case bodyt of
-        Just t' -> Just $ Type.Arr t t'
-        Nothing -> Nothing
-_typeOf (AST.Application left right) env =
-  let lt = _typeOf left env
-      rt = _typeOf right env in
+        Left t' -> Left $ Type.Arr t t'
+        Right e -> Right e
+typeOf' (AST.Application left right) env =
+  let lt = typeOf' left env
+      rt = typeOf' right env in
       case lt of
-        Just (Type.Arr a b) | Just a == rt -> Just b
-        Just (Type.Arr a _) -> Nothing -- type mismatch
-        Nothing -> Nothing
-        _ -> Nothing
+        Left (Type.Arr a b) | Left a == rt -> Left b
+        Left (Type.Arr a b) -> Right $ "Type mismatch in: " ++ show a ++ " applied to" ++ show b ++ "." -- type mismatch
+        Right e -> Right e
+        -- _ -> Nothing
