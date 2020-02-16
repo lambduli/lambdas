@@ -1,5 +1,6 @@
 module Untyped.AST where
 
+
 data Expression
   = Variable String
   | Abstraction String Expression
