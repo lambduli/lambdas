@@ -53,9 +53,30 @@ wrapTArr = do
   r <- rightParen
   return arr
 
+tForall :: ReadP T.Type
+tForall = do
+  s <- skipSpaces
+  f <- forall
+  s <- skipSpaces
+  TypeVar var <- typeVar
+  s <- skipSpaces
+  d <- dot
+  s <- skipSpaces
+  t <- typeAnnotation
+  return $ T.ForAll var t
+
+wrapForall :: ReadP T.Type
+wrapForall = do
+  s <- skipSpaces
+  l <- leftParen
+  f <- tForall
+  s <- skipSpaces
+  r <- rightParen
+  return f
+
 typeAnnotation :: ReadP T.Type
 typeAnnotation =
-  choice [tVar, tNat, tBool, wrapTArr, tArr]
+  choice [tVar, tNat, tBool, wrapTArr, tArr, wrapForall, tForall]
   
 
 -- EXP := VAR

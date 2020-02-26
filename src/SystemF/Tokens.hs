@@ -16,4 +16,5 @@ data Token
   | RightB
   | Arrow
   | Colon
+  | Forall
   deriving (Show)

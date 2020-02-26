@@ -44,11 +44,16 @@ typeOf' (Application left right) ctx =
       rt = typeOf' right ctx in
       case lt of
         Left (T.Arr a b) | Left a == rt -> Left b
-        Left (T.Arr a b) -> Right $ "Type mismatch in: " ++ show a ++ " applied to" ++ show b ++ "." -- type mismatch
+        Left (T.Arr a b) -> Right $ "APP Type mismatch in: " ++ show a ++ " applied to " ++ show rt ++ "." -- type mismatch
         Right e -> Right e
-        -- _ -> Right
-typeOf' (TypeApplication (TypeAbstraction par exp) type') ctx =
-  typeOf' exp $ addType par type' ctx
+        -- _ -> Right $ "Something broke " ++ show lt ++ " " ++ show rt ++ " ."
+typeOf' (TypeApplication term type') ctx =
+  let termT = typeOf' term ctx
+      specified = lookUp type' ctx in
+        case termT of
+          Left (T.ForAll par t) -> Left t
+          Left a -> Right $ "TAPP Type mismatch in: " ++ show a ++ " applied to " ++ show specified ++ "." -- type mismatch
+          Right e -> Right e
 typeOf' (TypeAbstraction par exp) ctx =
   case typeOf' exp ctx of
     Left t -> Left (T.ForAll par t)
@@ -60,4 +65,6 @@ lookUp (T.Parameter name) ctx =
     Left t -> t
     Right e -> T.Parameter name
 lookUp (T.Arr t1 t2) ctx = T.Arr (lookUp t1 ctx) (lookUp t2 ctx)
+lookUp (T.ForAll name type') ctx =
+  T.ForAll name $ lookUp type' ctx
 lookUp type' _ = type'

@@ -117,6 +117,11 @@ arr = do
   string "->"
   return Arrow
 
+forall :: ReadP Token
+forall = do
+  string "forall"
+  return Forall
+
 lexer :: ReadP [Token]
 lexer =
-  sepBy (choice [macro, operator, natural, var, typeVar, fnLambda, tpLambda, leftParen, rightParen, dot]) skipSpaces
+  sepBy (choice [macro, operator, natural, var, typeVar, fnLambda, tpLambda, leftParen, rightParen, dot, forall]) skipSpaces

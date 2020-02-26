@@ -33,6 +33,7 @@ unwrapType :: Either Type String -> String
 unwrapType (Left t) = "[" ++ show t ++ "]"
 unwrapType (Right e) = "[" ++ e ++ "]"
 
+-- (\ a : forall B . Nat . a [Nat]) (/ A . 23)
 -- (/ A . (\ a : A -> A . (\ b : A . a (a b)))) [Nat] ((/ E . (\ i : E . i)) [Nat]) 23
 -- (/ A . (\ a : A -> A . (\ b : A . a (a b)))) [Nat] (\ i : Nat . i) 23
 -- (/ A . (\ a : A -> A . (\ b : A . a b))) [Nat] (\ i : Nat . i) 23
