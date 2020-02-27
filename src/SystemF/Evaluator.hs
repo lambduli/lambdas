@@ -39,7 +39,7 @@ normalStep tree =
   case tree of
     TypeAbstraction arg exp -> TypeAbstraction arg $ normalStep exp
 
-    TypeApplication (TypeAbstraction arg exp) rightT -> typeBeta arg rightT exp
+    TypeApplication (TypeAbstraction arg exp) rightT -> typeBeta arg rightT exp -- TODO: type-level alpha
 
     Abstraction arg t body -> Abstraction arg t $ normalStep body
     
@@ -125,7 +125,7 @@ typeBeta arg t target =
     betaCurr = typeBeta arg t
   in
   case target of
-    Abstraction argName type' body -> Abstraction argName (substituteType arg t type') $ betaCurr body
+    Abstraction argName type' body -> Abstraction argName (T.substituteType arg t type') $ betaCurr body
     Application left right -> Application (betaCurr left) (betaCurr right)
     TypeAbstraction p exp ->
       if arg == p
@@ -134,8 +134,3 @@ typeBeta arg t target =
     TypeApplication exp t -> TypeApplication (betaCurr exp) t
 
     _ -> target
-
-substituteType :: String -> T.Type -> T.Type -> T.Type
-substituteType name t (T.Parameter p) = if name == p then t else (T.Parameter p)
-substituteType name t (T.Arr left right) = T.Arr (substituteType name t left) (substituteType name t right)
-substituteType name t type' = type'
