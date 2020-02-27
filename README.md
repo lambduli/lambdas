@@ -34,6 +34,9 @@ $ stack run systemF
 
 ### Commands:
 - `:step` for the next step of the evaluation
+- `:type` for type annotation of the current expression
+- `:isnormal` for checking if the expression is in the normal form
+- `:applyto` for adding an argument to the current expression
 - `:normalize` for the evaluation until the normal form is reached
 - `:new` for inputting different expression
 - `:bye` for exiting the program
@@ -59,4 +62,12 @@ $ stack run systemF
 [Nat] :: $ 23
 ```
 
+```
+[enter λ2 expression]
+:$ (\ a : forall A . A -> A -> A . a) (/ B . (\t : B . (\f : B . t)))
+:$ (λ a : (forall A . A -> A -> A) . a) (Λ B . (λ t : B . (λ f : B . t)))
+[command or expression]:$ :type
+[(forall A . A -> A -> A)]
+:$ (λ a : (forall A . A -> A -> A) . a) (Λ B . (λ t : B . (λ f : B . t)))
+```
 More coming (hopefully) soon.
