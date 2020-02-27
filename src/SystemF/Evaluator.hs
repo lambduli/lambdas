@@ -41,6 +41,9 @@ normalStep tree =
 
     TypeApplication (TypeAbstraction arg exp) rightT -> typeBeta arg rightT exp -- TODO: type-level alpha
 
+    TypeApplication left right ->
+      TypeApplication (normalStep left) right
+
     Abstraction arg t body -> Abstraction arg t $ normalStep body
     
     Application (Abstraction arg _ body) right -> beta arg right (alpha arg (freeVar right) body)

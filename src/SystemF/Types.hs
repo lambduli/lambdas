@@ -17,7 +17,7 @@ instance Show Type where
   show Boolean = "Bool"
 
 -- what about (forall A . Nat -> A -> Nat) == (forall B . Nat -> B -> Nat)
--- example: (\ a : forall A . A -> A -> A . a) (/ B . (\t : B . (\f : B . t)))
+-- example: (\ a : forall A . A -> A -> A . a) (/ B . (\t : B . (\f : B . t))) [Nat]
 instance Eq Type where
   (Parameter a) == (Parameter b) = a == b
   Nat == Nat = True

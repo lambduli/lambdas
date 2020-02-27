@@ -51,7 +51,7 @@ typeOf' (TypeApplication term type') ctx =
   let termT = typeOf' term ctx
       specified = lookUp type' ctx in
         case termT of
-          Left (T.ForAll par t) -> Left t
+          Left (T.ForAll par t) -> Left $ T.substituteType par specified t
           Left a -> Right $ "TAPP Type mismatch in: " ++ show a ++ " applied to " ++ show specified ++ "." -- type mismatch
           Right e -> Right e
 typeOf' (TypeAbstraction par exp) ctx =

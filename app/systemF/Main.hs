@@ -5,7 +5,7 @@ import System.IO
 
 import SystemF.Parser (expression, typeAnnotation)
 import SystemF.AST (Expression(..))
-import SystemF.Evaluator (normalize, normalStep)
+import SystemF.Evaluator (normalize, normalStep, normalForm)
 import SystemF.Types (Type(..))
 import SystemF.TypeChecker (typeOf)
 
@@ -18,7 +18,7 @@ main = do
 
 execCommand :: Expression -> IO ()
 execCommand exp = do
-  putStr $ unwrapType (typeOf exp) ++ " :: $ "
+  putStr ":$ "
   hFlush stdout
   print exp
   cmnd <- prompt "[command or expression]:$ "
@@ -26,6 +26,17 @@ execCommand exp = do
     ":step" -> execCommand $ normalStep exp
     ":normalize" -> execCommand $ normalize exp
     ":new" -> main
+    ":type" -> do
+      putStrLn $ unwrapType (typeOf exp)
+      execCommand exp
+    ":isnormal" -> do
+      print $ normalForm exp
+      execCommand exp
+    ":applyto" -> do
+      putStrLn "[enter λ2 expression]"
+      line <- prompt ":$ "
+      let ast = fst $ last $ readP_to_S expression line
+      execCommand $ Application exp ast
     ":bye" -> return ()
     _ -> execCommand $ fst $ last $ readP_to_S expression cmnd
 
