@@ -5,7 +5,7 @@ import System.IO
 
 import Simply.Parser (expression, typeAnnotation)
 import Simply.AST (Expression(..))
-import Simply.Evaluator (normalize, normalStep)
+import Simply.Evaluator (normalize, normalStep, normalForm)
 import Simply.Types (Type(..))
 import Simply.TypeChecker (typeOf)
 
@@ -26,6 +26,17 @@ execCommand exp = do
     ":step" -> execCommand $ normalStep exp
     ":normalize" -> execCommand $ normalize exp
     ":new" -> main
+    ":type" -> do
+      putStrLn $ unwrapType (typeOf exp)
+      execCommand exp
+    ":isnormal" -> do
+      print $ normalForm exp
+      execCommand exp
+    ":applyto" -> do
+      putStrLn "[enter λ2 expression]"
+      line <- prompt ":$ "
+      let ast = fst $ last $ readP_to_S expression line
+      execCommand $ Application exp ast
     ":bye" -> return ()
     _ -> execCommand $ fst $ last $ readP_to_S expression cmnd
 
