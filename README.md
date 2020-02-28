@@ -51,23 +51,49 @@ $ stack run systemF
 ```
 [enter λ-> expression]
 :$ (\ a : Bool -> Bool -> Bool . (\ b : Bool -> Bool . (\ c : Bool . a (b c) c)))
-[(Bool -> Bool -> Bool) -> (Bool -> Bool) -> Bool -> Bool] :: $ (λ a : Bool -> Bool -> Bool . (λ b : Bool -> Bool . (λ c : Bool . a (b c) c)))
+[command or expression]:$ :type
+:: (Bool -> Bool -> Bool) -> (Bool -> Bool) -> Bool -> Bool
 ```
 
 ```
 [enter λ-> expression]
 :$ (\ a : Bool -> Nat . (\ b : Bool . a b)) (\ e : Bool . 23) T
-[Nat] :: $ (λ a : Bool -> Nat . (λ b : Bool . a b)) (λ e : Bool . 23) T
-[command]:$ :normalize
-[Nat] :: $ 23
+[command or expression]:$ :type
+:: Nat
+[command or expression]:$ :step     
+:$ (λ b : Bool . (λ e : Bool . 23) b) T
+[command or expression]:$ :step
+:$ (λ e : Bool . 23) T
+[command or expression]:$ :step
+:$ 23
 ```
 
 ```
 [enter λ2 expression]
 :$ (\ a : forall A . A -> A -> A . a) (/ B . (\t : B . (\f : B . t)))
-:$ (λ a : (forall A . A -> A -> A) . a) (Λ B . (λ t : B . (λ f : B . t)))
 [command or expression]:$ :type
-[(forall A . A -> A -> A)]
-:$ (λ a : (forall A . A -> A -> A) . a) (Λ B . (λ t : B . (λ f : B . t)))
+:: (forall A . A -> A -> A)
 ```
+
+```
+[enter λ2 expression]
+:$ (\ a : forall A . A -> A -> A . a) (/ B . (\t : B . (\f : B . t))) [Nat]
+[command or expression]:$ :step
+:$ (Λ B . (λ t : B . (λ f : B . t))) [Nat]
+[command or expression]:$ :step
+:$ (λ t : Nat . (λ f : Nat . t))
+[command or expression]:$ :applyto
+[enter λ2 expression]
+:$ 23
+[command or expression]:$ :type
+:: Nat -> Nat
+[command or expression]:$ :step
+:$ (λ f : Nat . 23)
+[command or expression]:$ :applyto
+[enter λ2 expression]
+:$ 42
+[command or expression]:$ :step
+:$ 23
+```
+
 More coming (hopefully) soon.
