@@ -44,7 +44,7 @@ typeOf' (Application left right) ctx =
       rt = typeOf' right ctx in
       case lt of
         Left (T.Arr a b) | Left a == rt -> Left b
-        Left (T.Arr a b) -> Right $ "APP Type mismatch in: " ++ show a ++ " applied to " ++ present rt ++ "." -- type mismatch
+        Left (T.Arr a b) -> Right $ "APP Type mismatch in: " ++ present lt ++ " applied to " ++ present rt ++ "." -- type mismatch
         Right e -> Right e
         -- _ -> Right $ "Something broke " ++ show lt ++ " " ++ show rt ++ " ."
 typeOf' (TypeApplication term type') ctx =
