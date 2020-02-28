@@ -31,6 +31,9 @@ execCommand exp = do
       print normal
       execCommand normal
     ":new" -> main
+    ":print" -> do
+      print exp
+      execCommand exp
     ":type" -> do
       putStr ":: "
       putStrLn $ unwrapType (typeOf exp)

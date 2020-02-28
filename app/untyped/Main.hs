@@ -32,6 +32,9 @@ execCommand exp = do
       print normal
       execCommand normal
     ":new" -> main
+    ":print" -> do
+      print exp
+      execCommand exp
     ":isnormal" -> do
       print $ normalForm exp
       execCommand exp
