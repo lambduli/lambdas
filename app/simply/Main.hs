@@ -18,7 +18,7 @@ main = do
 
 execCommand :: Expression -> IO ()
 execCommand exp = do
-  putStr $ unwrapType (typeOf exp) ++ " :: $ "
+  putStr ":$ "
   hFlush stdout
   print exp
   cmnd <- prompt "[command or expression]:$ "
