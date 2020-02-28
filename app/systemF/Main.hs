@@ -3,7 +3,7 @@ module Main where
 import Text.ParserCombinators.ReadP
 import System.IO
 
-import SystemF.Parser (expression, typeAnnotation)
+import SystemF.Parser (expression)
 import SystemF.AST (Expression(..))
 import SystemF.Evaluator (normalize, normalStep, normalForm)
 import SystemF.Types (Type(..))

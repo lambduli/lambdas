@@ -3,7 +3,7 @@ module Main where
 import Text.ParserCombinators.ReadP
 import System.IO
 
-import Simply.Parser (expression, typeAnnotation)
+import Simply.Parser (expression)
 import Simply.AST (Expression(..))
 import Simply.Evaluator (normalize, normalStep, normalForm)
 import Simply.Types (Type(..))
