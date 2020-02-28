@@ -47,8 +47,8 @@ execCommand exp = do
     _ -> execCommand $ fst $ last $ readP_to_S expression cmnd
 
 unwrapType :: Either Type String -> String
-unwrapType (Left t) = "[" ++ show t ++ "]"
-unwrapType (Right e) = "[" ++ e ++ "]"
+unwrapType (Left t) = show t
+unwrapType (Right e) = "~" ++ e ++ "~"
 
 -- (\ a : forall B . Nat . a [Nat]) (/ A . 23)
 -- (/ A . (\ a : A -> A . (\ b : A . a (a b)))) [Nat] ((/ E . (\ i : E . i)) [Nat]) 23
