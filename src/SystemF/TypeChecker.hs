@@ -42,11 +42,14 @@ typeOf' (Abstraction arg t body) ctx =
 typeOf' (Application left right) ctx =
   let lt = typeOf' left ctx
       rt = typeOf' right ctx in
-      case lt of
-        Left (T.Arr a b) | Left a == rt -> Left b
-        Left (T.Arr a b) -> Right $ "APP Type mismatch in: " ++ present lt ++ " applied to " ++ present rt ++ "." -- type mismatch
-        Right e -> Right e
-        -- _ -> Right $ "Something broke " ++ show lt ++ " " ++ show rt ++ " ."
+        case rt of
+          Right e -> Right e
+          Left _ ->
+            case lt of
+              Left (T.Arr a b) | Left a == rt -> Left b
+              Left (T.Arr a b) -> Right $ "APP Type mismatch in: " ++ present lt ++ " applied to " ++ show right ++ ":" ++ present rt ++ "." -- type mismatch
+              Right e -> Right e
+              -- _ -> Right $ "Something broke " ++ show lt ++ " " ++ show rt ++ " ."
 typeOf' (TypeApplication term type') ctx =
   let termT = typeOf' term ctx
       specified = lookUp type' ctx in
