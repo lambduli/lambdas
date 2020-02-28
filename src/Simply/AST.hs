@@ -15,7 +15,7 @@ data Expression
 instance Show Expression where
   show (Variable name) = name
   show (Abstraction arg t body) = "(λ " ++ arg ++ " : " ++ show t ++ " . " ++ show body ++ ")"
-  show (Application left (Application rleft rright)) = show left ++ " (" ++ show rleft ++ " " ++ show rright ++ ")"
+  show (Application left (Application rleft rright)) = "(" ++ show left ++ " (" ++ show rleft ++ " " ++ show rright ++ "))"
   show (Application left right) = show left ++ " " ++ show right
   show (Natural n) = show n
   show (Macro str) = str

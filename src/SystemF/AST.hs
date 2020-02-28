@@ -21,7 +21,7 @@ instance Show Expression where
   show (Variable name) = name
   show (TypeAbstraction param body) = "(Λ " ++ param ++ " . " ++ show body ++ ")"
   show (Abstraction arg t body) = "(λ " ++ arg ++ " : " ++ show t ++ " . " ++ show body ++ ")"
-  show (Application left (Application rleft rright)) = show left ++ " (" ++ show rleft ++ " " ++ show rright ++ ")"
+  show (Application left (Application rleft rright)) = "(" ++ show left ++ " (" ++ show rleft ++ " " ++ show rright ++ "))"
   show (Application left right) = show left ++ " " ++ show right
   
   show (TypeApplication left right) = show left ++ " [" ++ show right ++ "]" -- may need parens around
