@@ -43,6 +43,9 @@ typeOf' (Application left right) env =
       rt = typeOf' right env in
       case lt of
         Left (T.Arr a b) | Left a == rt -> Left b
-        Left (T.Arr a b) -> Right $ "Type mismatch in: " ++ show a ++ " applied to" ++ show b ++ "." -- type mismatch
+        Left (T.Arr a b) -> Right $ "Type mismatch in: " ++ show a ++ " applied to " ++ present rt ++ "." -- type mismatch
         Right e -> Right e
         -- _ -> Nothing
+
+present :: Either T.Type String -> String
+present = either show id
