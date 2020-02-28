@@ -5,7 +5,7 @@ import System.IO
 
 import Untyped.Parser (expression)
 import Untyped.AST (Expression(..))
-import Untyped.Evaluator (normalize, normalStep)
+import Untyped.Evaluator (normalize, normalStep, normalForm)
 
 main :: IO ()
 main = do
@@ -24,6 +24,14 @@ execCommand exp = do
     ":step" -> execCommand $ normalStep exp
     ":normalize" -> execCommand $ normalize exp
     ":new" -> main
+    ":isnormal" -> do
+      print $ normalForm exp
+      execCommand exp
+    ":applyto" -> do
+      putStrLn "[enter λ2 expression]"
+      line <- prompt ":$ "
+      let ast = fst $ last $ readP_to_S expression line
+      execCommand $ Application exp ast
     ":bye" -> return ()
     _ -> execCommand $ fst $ last $ readP_to_S expression cmnd
 
