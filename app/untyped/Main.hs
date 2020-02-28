@@ -16,13 +16,21 @@ main = do
 
 execCommand :: Expression -> IO ()
 execCommand exp = do
-  putStr ":$ "
-  hFlush stdout
-  print exp
+  -- putStr ":$ "
+  -- hFlush stdout
+  -- print exp
   cmnd <- prompt "[command or expression]:$ "
   case cmnd of
-    ":step" -> execCommand $ normalStep exp
-    ":normalize" -> execCommand $ normalize exp
+    ":step" -> do
+      let next = normalStep exp
+      putStr ":$ "
+      print next
+      execCommand next
+    ":normalize" -> do
+      let normal = normalize exp
+      putStr ":$ "
+      print normal
+      execCommand normal
     ":new" -> main
     ":isnormal" -> do
       print $ normalForm exp
