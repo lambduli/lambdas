@@ -44,7 +44,7 @@ typeOf' (Application left right) ctx =
       rt = typeOf' right ctx in
       case lt of
         Left (T.Arr a b) | Left a == rt -> Left b
-        Left (T.Arr a b) -> Right $ "APP Type mismatch in: " ++ show a ++ " applied to " ++ show rt ++ "." -- type mismatch
+        Left (T.Arr a b) -> Right $ "APP Type mismatch in: " ++ show a ++ " applied to " ++ present rt ++ "." -- type mismatch
         Right e -> Right e
         -- _ -> Right $ "Something broke " ++ show lt ++ " " ++ show rt ++ " ."
 typeOf' (TypeApplication term type') ctx =
@@ -68,3 +68,6 @@ lookUp (T.Arr t1 t2) ctx = T.Arr (lookUp t1 ctx) (lookUp t2 ctx)
 lookUp (T.ForAll name type') ctx =
   T.ForAll name $ lookUp type' ctx
 lookUp type' _ = type'
+
+present :: Either T.Type String -> String
+present = either show id
