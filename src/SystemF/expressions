@@ -1,0 +1,40 @@
+-------- Type Level Alpha Conversions
+
+---- Type Checking
+(Λ A . (λ l : A -> A . (Λ A . l)))
+-- tests if typechecking correctly identifies type-level alpha colision
+
+
+(Λ A . (λ l : A . (Λ A . l)))
+-- same as the above, but simpler
+
+(Λ A . (λ l : A -> A . (Λ A . (λ k : A . l))))
+-- same as the above, but more complicated
+
+---- all of them need to rename second A and correctly identify types inside expression of the second type abstraction
+
+---- Type Checking + Evaluation + Type Checking again
+(Λ A . (λ l : A -> A . (Λ A . l)) (λ k : A . (Λ A . (λ a : A . a)) [A] k))
+-- tests if type of original expression is same as the type of normal form of the expression
+
+(Λ A . (λ l : A -> A . (Λ B . l)) (λ k : A . (Λ A . (λ a : A . a)) [A] k))
+-- this one is same as the above but without colision - the one above should work like this one
+
+
+-------- Ill Formed Expressions
+
+----
+(Λ B .(Λ A . (λ l : A -> A . (Λ B . l)) (λ k : A . (Λ A . (λ a : A . a)) [B] k)))
+-- should type mismatch because (Λ A . (λ a : A . a)) [B] is applied to k : A
+
+(Λ A . (λ l : A -> A . (Λ B . l)) (λ k : A . (Λ A . (λ a : A . a)) [A] k))
+-- this is corrected version of the above -- this should be OK
+
+-------- Other Edge Cases around Alpha Conversions
+
+----
+(Λ A . (λ l : A -> A . (Λ A . l) [Nat]) (λ k : A . (Λ A . (λ a : A . a)) [A] k))
+-- this should type check correctly -- important is the [Nat] part
+
+(Λ A . (λ l : A -> A . (Λ B . l) [Nat]) (λ k : A . (Λ A . (λ a : A . a)) [A] k))
+-- this is same as the above, but with renamed potentialy problematic type abstraction parameter
