@@ -5,7 +5,7 @@ import System.IO
 
 import SystemF.Parser (expression)
 import SystemF.AST (Expression(..))
-import SystemF.Evaluator (normalize, normalStep, normalForm)
+import SystemF.Evaluator (normalize, normalStep, normalForm, freeTVar, freeTVar'')
 import SystemF.Types (Type(..))
 import SystemF.TypeChecker (typeOf)
 
@@ -47,6 +47,9 @@ execCommand exp = do
       let ast = fst $ last $ readP_to_S expression line
       execCommand $ Application exp ast
     ":bye" -> return ()
+    ":freeTVar" -> do
+      print $ freeTVar exp
+      execCommand exp
     _ -> execCommand $ fst $ last $ readP_to_S expression cmnd
 
 unwrapType :: Either Type String -> String
