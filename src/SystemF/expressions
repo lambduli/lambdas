@@ -20,6 +20,19 @@
 (Λ A . (λ l : A -> A . (Λ B . l)) (λ k : A . (Λ A . (λ a : A . a)) [A] k))
 -- this one is same as the above but without colision - the one above should work like this one
 
+---- Type Checking
+(Λ Y . (Λ A . (Λ Y . (λ k : A . k))) [(forall X . X -> Y)])
+-- this one test type-level alpha colision in typechecking
+-- the problem here is - I fixed it in a "strange" way
+-- because outer-most Y is renamed instead of the inner one
+-- it works like that because when outer most TYABS searches its body for free type variables
+-- it finds its own bound variable Y (in the type argument) and considers it collision
+-- it then changes the outer-most Y to Y' instead of the inner-most one
+-- this is kinda weird and I am not sure if correct!!!
+
+(Λ A . (Λ Y . (λ k : A . k))) [(forall X . X -> Y)]
+-- this one is simplification of the previous one it works correctly
+
 
 -------- Ill Formed Expressions
 
