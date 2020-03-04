@@ -3,7 +3,7 @@ module SystemF.TypeChecker where
 import Data.Set (Set, toList)
 
 import SystemF.AST (Expression(..))
-import SystemF.Evaluator (freeVar)
+import SystemF.Evaluator (freeVar, freeTVar)
 import qualified SystemF.Types as T
 
 
@@ -80,6 +80,7 @@ typeOf' (TypeApplication (TypeAbstraction par exp) type') termCtx typeCtx =
   in
     typeOf' exp termCtx newTypeCtx -- TYAPP (Urcite forall A . T) (Urcite T') -- pokud T neexistuje - neexistuje typ TYAPP
 
+-- Otazka - Pouzije se vubec nekdy tohle? Jak muze byt TYAPP kdyz jeji left neni TYABS
 typeOf' (TypeApplication term type') termCtx typeCtx =
   let termT = typeOf' term termCtx typeCtx
       specified = specify type' typeCtx in
@@ -91,7 +92,10 @@ typeOf' (TypeApplication term type') termCtx typeCtx =
 typeOf' (TypeAbstraction par exp) termCtx typeCtx =
   let
     expFV = toList $ freeVar exp
-    typeAlphaColision = hasTAlphaColision par expFV termCtx
+    typFV = freeTVar exp
+    freeTermVarAlphaColision = hasTAlphaColision par expFV termCtx
+    freeTypeVarAlphaColision = any (standsIn par) $ map (\ name -> specify (T.Parameter name) typeCtx) typFV  -- elem par typFV
+    typeAlphaColision = freeTermVarAlphaColision || freeTypeVarAlphaColision
     (par', exp') =
       if typeAlphaColision
         then ((par ++ "'"), replaceFTVar par (par ++ "'") exp) -- pokud je kolize je potreba prejmenovat `par` a prejmenovat `par` i uvnitr `exp`
