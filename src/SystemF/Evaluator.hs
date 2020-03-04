@@ -39,7 +39,7 @@ normalStep tree =
   case tree of
     TypeAbstraction arg exp -> TypeAbstraction arg $ normalStep exp
 
-    TypeApplication (TypeAbstraction arg exp) rightT -> typeBeta arg rightT exp
+    TypeApplication (TypeAbstraction arg exp) rightT -> typeBeta arg rightT $ typeTAlpha arg (freeTTVar rightT) exp
 
     TypeApplication left right ->
       TypeApplication (normalStep left) right
@@ -54,6 +54,19 @@ normalStep tree =
         else Application (normalStep left) right
 
     _ -> tree
+
+-- TODO following 3 functions do roughly the same thing - only on different inputs
+-- somehow combine them out/together
+freeTTVar :: T.Type -> [String]
+freeTTVar T.Nat = []
+freeTTVar T.Boolean = []
+freeTTVar t = freeTVar'' [] [] t
+  -- where
+  --   freeTTVar' bound free t =
+  --     case t of
+  --       T.Parameter p -> if elem p bound then free else p : free -- TODO: if p already in free - don't
+  --       T.Arr leftT rightT -> (freeTTVar' bound free leftT) ++ (freeTTVar' bound free leftT)
+  --       T.ForAll par t'
 
 freeTVar :: Expression -> [String]
 freeTVar = freeTVar' [] [] where
@@ -95,12 +108,36 @@ freeVar = freeVar' Set.empty Set.empty where
       TypeApplication left t -> freeVar' bound freeVars left
       _ -> freeVars -- Number, Boolean, Macro, Operator
 
+
+-- TODO: similar situation - next 3 functions solve similar problem just on different inputs/levels
+typeTAlpha :: String -> [String] -> Expression -> Expression
+typeTAlpha arg free exp =
+  let alphaCurr = typeTAlpha arg free
+  in
+    case exp of
+      TypeAbstraction p exp' ->
+        if arg == p -- shadowing on type level
+          then exp
+          else if elem arg (freeTVar exp') && elem p free
+            then
+              let
+                newName = p ++ "'"
+                replacement = T.Parameter newName
+              in
+                TypeAbstraction newName $ alphaCurr $ typeBeta p replacement exp'
+          else exp
+      Abstraction argument t body -> Abstraction argument t $ alphaCurr body
+      Application left right -> Application (alphaCurr left) (alphaCurr right)
+      TypeApplication left t -> TypeApplication (alphaCurr left) t
+      _ -> exp
+
+
 typeAlpha :: String -> [String] -> Expression -> Expression
 typeAlpha arg free exp =
   let alphaCurr = typeAlpha arg free in
     case exp of
       TypeAbstraction p exp' ->
-        if arg == p
+        if arg == p -- tohle se snad nikdy nemuze stat ne? arg je lowercase a p je uppercase -- OTESTOVAT ruzna exprs jestil kdyz to smazu tak se nic mezneni a analyzovat jesi se to skutecne nikdy nemuze stat
           then exp
           else if elem arg (freeVar exp') && elem p free then
             let
