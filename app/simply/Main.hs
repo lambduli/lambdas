@@ -42,7 +42,7 @@ execCommand exp = do
       print $ normalForm exp
       execCommand exp
     ":applyto" -> do
-      putStrLn "[enter λ2 expression]"
+      putStrLn "[enter λ-> expression]"
       line <- prompt ":$ "
       let ast = fst $ last $ readP_to_S expression line
       execCommand $ Application exp ast
