@@ -45,7 +45,7 @@ normalStep tree =
         (True, False) -> Application left (normalStep right)
         (True, True)
           | builtInBinary tree -> betaValue tree
-          | builtInUnary left -> Application (betaValue left) right
+          | builtInUnary tree -> betaValue tree
           | otherwise -> Application left right
     _ -> tree
 
