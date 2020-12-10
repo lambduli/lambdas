@@ -25,7 +25,15 @@ normalForm tree =
     Abstraction _ _ body -> normalForm body
     
     Application (Abstraction _ _ _) _ -> False
-    Application left right -> normalForm left && normalForm right
+    Application left right ->
+      case (normalForm left, normalForm right) of
+        (False, _) -> False
+        (True, False) -> False
+        (True, True)
+          | builtInBinary tree -> False
+          | builtInUnary left -> False
+          | otherwise -> True
+    -- Application left right -> normalForm left && normalForm right
     
     _ -> True
     -- Variable _ -> True
@@ -49,11 +57,42 @@ normalStep tree =
     Application (Abstraction arg _ body) right -> beta arg right $ typeAlpha arg (freeTVar right) $ alpha arg (freeVar right) body
 
     Application left right ->
-      if normalForm left
-        then Application left (normalStep right)
-        else Application (normalStep left) right
+      case (normalForm left, normalForm right) of
+        (False, _) -> Application (normalStep left) right
+        (True, False) -> Application left (normalStep right)
+        (True, True)
+          | builtInBinary tree -> betaValue tree
+          | builtInUnary tree -> betaValue tree
+          | otherwise -> Application left right
+
+    -- Application left right ->
+    --   if normalForm left
+    --     then Application left (normalStep right)
+    --     else Application (normalStep left) right
 
     _ -> tree
+
+
+builtInBinary :: Expression -> Bool
+builtInBinary (Application (Application (Operator op) left) right)
+  | isBinary op = True
+  | otherwise = False
+builtInBinary _ = False
+
+builtInUnary :: Expression -> Bool
+builtInUnary (Application (Operator op) right)
+  | isUnary op = True
+  | otherwise = False
+builtInUnary _ = False
+
+isBinary :: String -> Bool
+isBinary op
+  = elem op ["=", "+", "-", "*", "/", "%", "^", ">=", "<=", "&&", "||"]
+
+isUnary :: String -> Bool
+isUnary "!" = True
+isUnary _ = False
+
 
 -- TODO following 3 functions do roughly the same thing - only on different inputs
 -- somehow combine them out/together
@@ -211,3 +250,30 @@ typeBeta arg t target =
         else TypeAbstraction p $ betaCurr exp
     TypeApplication exp t' -> TypeApplication (betaCurr exp) $ T.substituteType arg t t'
     _ -> target
+
+-- ["=", "+", "-", "*", "/", "%", "^", ">=", "<=", "&&", "||"]
+betaValue :: Expression -> Expression
+betaValue (Application (Application (Operator "=") (Natural left)) (Natural right))
+  = Boolean $ left == right
+betaValue (Application (Application (Operator "+") (Natural left)) (Natural right))
+  = Natural $ left + right
+betaValue (Application (Application (Operator "-") (Natural left)) (Natural right))
+  = Natural $ left - right
+betaValue (Application (Application (Operator "*") (Natural left)) (Natural right))
+  = Natural $ left * right
+betaValue (Application (Application (Operator "/") (Natural left)) (Natural right))
+  = Natural $ left `div` right
+betaValue (Application (Application (Operator "%") (Natural left)) (Natural right))
+  = Natural $ left `mod` right
+betaValue (Application (Application (Operator "^") (Natural left)) (Natural right))
+  = Natural $ left ^ right
+betaValue (Application (Application (Operator ">=") (Natural left)) (Natural right))
+  = Boolean $ left >= right
+betaValue (Application (Application (Operator "<=") (Natural left)) (Natural right))
+  = Boolean $ left <= right
+betaValue (Application (Application (Operator "&&") (Boolean left)) (Boolean right))
+  = Boolean $ left && right
+betaValue (Application (Application (Operator "||") (Boolean left)) (Boolean right))
+  = Boolean $ left || right
+betaValue (Application (Operator "!") (Boolean left))
+  = Boolean $ not left
