@@ -49,6 +49,7 @@ free2 bound freeVars tree =
         rightFree = free2 bound freeVars right
       in
       Set.union leftFree rightFree
+    _ -> Set.empty
 
 alpha :: String -> Set String -> Expression -> Expression
 alpha arg freeArg tree =
@@ -87,3 +88,5 @@ beta arg value target =
       else
         Abstraction argName (betaCurr body)
     Application left right -> Application (betaCurr left) (betaCurr right)
+    _ -> target
+  
