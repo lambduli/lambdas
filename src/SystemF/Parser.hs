@@ -114,8 +114,8 @@ macro' = do
   space <- skipSpaces
   m <- macro
   case m of
-    Macro "T" -> return $ AST.Boolean True
-    Macro "F" -> return $ AST.Boolean False
+    Macro "True" -> return $ AST.Boolean True
+    Macro "False" -> return $ AST.Boolean False
     Macro str -> return $ AST.Macro str
   -- case m of Macro str -> return $ AST.Macro str
 

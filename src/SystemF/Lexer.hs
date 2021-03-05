@@ -104,8 +104,9 @@ natural = do
 
 macro :: ReadP Token
 macro = do
-  name <- munch1 isUpper
-  return $ Macro name
+  start <- munch1 isUpper
+  end <- munch isLower
+  return $ Macro $ start ++ end
 
 colon :: ReadP Token
 colon = do
