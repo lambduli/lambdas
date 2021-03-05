@@ -26,9 +26,10 @@ $ stack run systemF
 ## Controls:
 - write `λ` as `\`
 - write `Λ` as `/`
-- use numbers such as `23`
 - Simple Types: `Nat` and `Bool`
 - System F Types: `Nat` and `Bool`
+- write normal numbers like `23`
+- write Booleans like `True` and `False`
 - write System F type arguments as `[Nat]`
 - you can omit redundant parentheses both in expressions and in type annotations
 
