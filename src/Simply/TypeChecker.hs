@@ -21,8 +21,6 @@ typeOfTerm "<=" = Left $ T.Nat `T.Arr` (T.Nat `T.Arr` T.Boolean)
 typeOfTerm "&&" = Left $ T.Boolean `T.Arr` (T.Boolean `T.Arr` T.Boolean)
 typeOfTerm "||" = Left $ T.Boolean `T.Arr` (T.Boolean `T.Arr` T.Boolean)
 typeOfTerm "!" = Left $ T.Boolean `T.Arr` T.Boolean
--- typeOfTerm "T" = Left T.Boolean
--- typeOfTerm "F" = Left T.Boolean
 typeOfTerm _ = Right "Term has no type."
 
 addType :: String -> T.Type -> Context -> Context

@@ -95,8 +95,9 @@ isMacro char =
 
 macro :: ReadP Token
 macro = do
-  name <- munch1 isMacro
-  return $ Macro name
+  start <- munch1 isMacro
+  end <- munch isLetter
+  return $ Macro $ start ++ end
 
 colon :: ReadP Token
 colon = do

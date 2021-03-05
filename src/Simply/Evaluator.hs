@@ -26,13 +26,7 @@ normalForm tree =
           | builtInBinary tree -> False
           | builtInUnary left -> False
           | otherwise -> True
-    -- Application left right -> normalForm left && normalForm right
     _ -> True
-    -- Variable _ -> True
-    -- Natural _ -> True
-    -- Boolean _ -> True
-    -- Macro _ -> True
-    -- Operator _ -> True
 
 normalStep :: Expression -> Expression
 normalStep tree =
@@ -64,7 +58,7 @@ builtInUnary _ = False
 
 isBinary :: String -> Bool
 isBinary op
-  = elem op ["=", "+", "-", "*", "/", "%", "^", ">=", "<=", "&&", "||"]
+  = op `elem` ["=", "+", "-", "*", "/", "%", "^", ">=", "<=", "&&", "||"]
 
 isUnary :: String -> Bool
 isUnary "!" = True
@@ -72,24 +66,24 @@ isUnary _ = False
 
 
 free :: Expression -> Set String
-free = free2 Set.empty Set.empty
-
-free2 :: Set String -> Set String -> Expression -> Set String
-free2 bound freeVars tree =
-  case tree of
-    Variable name ->
-      if Set.member name bound then
-        freeVars
-      else
-        Set.insert name freeVars
-    Abstraction arg _ body -> free2 (Set.insert arg bound) freeVars body
-    Application left right ->
-      let
-        leftFree = free2 bound freeVars left
-        rightFree = free2 bound freeVars right
-      in
-      Set.union leftFree rightFree
-    _ -> freeVars -- Number, Boolean, Macro
+free = free' Set.empty Set.empty
+  where
+    free' :: Set String -> Set String -> Expression -> Set String
+    free' bound freeVars tree =
+      case tree of
+        Variable name ->
+          if Set.member name bound then
+            freeVars
+          else
+            Set.insert name freeVars
+        Abstraction arg _ body -> free' (Set.insert arg bound) freeVars body
+        Application left right ->
+          let
+            leftFree = free' bound freeVars left
+            rightFree = free' bound freeVars right
+          in
+          Set.union leftFree rightFree
+        _ -> freeVars -- Number, Boolean, Macro
 
 alpha :: String -> Set String -> Expression -> Expression
 alpha arg freeArg tree =

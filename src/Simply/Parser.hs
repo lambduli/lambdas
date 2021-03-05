@@ -75,8 +75,8 @@ mac = do
   space <- skipSpaces
   macro <- macro
   case macro of
-    Macro "T" -> return $ AST.Boolean True
-    Macro "F" -> return $ AST.Boolean False
+    Macro "True" -> return $ AST.Boolean True
+    Macro "False" -> return $ AST.Boolean False
     Macro str -> return $ AST.Macro str
 
 oper :: ReadP AST.Expression
