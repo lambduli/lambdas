@@ -39,7 +39,6 @@ $ stack run systemF
 - `:applyto` for adding an argument to the current expression
 - `:normalize` for the evaluation until the normal form is reached
 - `:new` for inputting different expression
-- `:print` for printing the current expression
 - `:bye` for exiting the program
 
 #### Examples:
