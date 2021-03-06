@@ -7,9 +7,10 @@ data Token
   | Dot
   | FunctionLambda
   | TypeLambda
-  | Macro String
+  -- | Macro String
   | Operator String
   | Natural Int
+  | Boolean Bool
   | LeftP
   | RightP
   | LeftB
