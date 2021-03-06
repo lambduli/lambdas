@@ -30,7 +30,7 @@ leftPart = do
   left <- choice [tNat, tBool, wrapTArr]
   space <- skipSpaces
   arrow <- arr
-  return $ left
+  return left
 
 tArr :: ReadP T.Type
 tArr = do
@@ -70,14 +70,13 @@ num = do
   number <- number
   case number of Natural int -> return $ AST.Natural int
 
-mac :: ReadP AST.Expression
-mac = do
+boolean :: ReadP AST.Expression
+boolean = do
   space <- skipSpaces
-  macro <- macro
-  case macro of
-    Macro "True" -> return $ AST.Boolean True
-    Macro "False" -> return $ AST.Boolean False
-    Macro str -> return $ AST.Macro str
+  b <- bool
+  case b of
+    Boolean True -> return $ AST.Boolean True
+    Boolean False -> return $ AST.Boolean False
 
 oper :: ReadP AST.Expression
 oper = do
@@ -87,8 +86,8 @@ oper = do
 
 app :: ReadP AST.Expression
 app = do
-  left <- choice [wrapped, var, oper, mac, num, abst]
-  ids <- many1 $ choice [wrapped, var, oper, mac, num, abst]
+  left <- choice [wrapped, var, oper, boolean, num, abst]
+  ids <- many1 $ choice [wrapped, var, oper, boolean, num, abst]
   return $ foldl (\exp id -> AST.Application exp id) left ids
 
 abst :: ReadP AST.Expression
@@ -126,4 +125,4 @@ wrapped = do
 -- TODO: take care of exprs: (λ a : Int -> Boolean, b : Boolean -> Char, c : Int . b (a c))
 expression :: ReadP AST.Expression
 expression =  
-  choice [var, num, mac, oper, app, abst, wrapped]
+  choice [var, num, boolean, oper, app, abst, wrapped]

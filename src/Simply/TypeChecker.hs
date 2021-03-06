@@ -39,7 +39,6 @@ typeOf' :: Expression -> Context -> Either T.Type String
 typeOf' (Natural n) _ = Left T.Nat
 typeOf' (Boolean b) _ = Left T.Boolean
 typeOf' (Operator op) _ = typeOfTerm op
-typeOf' (Macro t) _ = typeOfTerm t
 typeOf' (Variable v) env = getType v env
 typeOf' (Abstraction arg t body) env =
   let newEnv = addType arg t env
@@ -54,7 +53,6 @@ typeOf' (Application left right) env =
         Left (T.Arr a b) | Left a == rt -> Left b
         Left (T.Arr a b) -> Right $ "Type mismatch in: " ++ present lt ++ " applied to " ++ present rt ++ "." -- type mismatch
         Right e -> Right e
-        -- _ -> Nothing
 
 present :: Either T.Type String -> String
 present = either show id

@@ -5,9 +5,9 @@ data Token
   = Identifier String
   | Dot
   | Lambda
-  | Macro String
   | Operator String
   | Natural Int
+  | Boolean Bool
   | LeftP
   | RightP
   | Arrow
