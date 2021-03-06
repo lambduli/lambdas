@@ -30,6 +30,7 @@ $ stack run systemF
 - System F Types: `Nat` and `Bool`
 - write normal numbers like `23`
 - write Booleans like `True` and `False`
+- write System F type parameters as upper case letters `(Λ T . (λ i : T . i))`
 - write System F type arguments as `[Nat]`
 - you can omit redundant parentheses both in expressions and in type annotations
 
@@ -114,32 +115,32 @@ On the other hand following example just shows step by step evaluation of the we
   λ2 >> (\ a : forall A . A -> A -> A . a) (/ B . (\t : B . (\f : B . t))) [Nat]
         (λ a : (forall A . A -> A -> A) . a) (Λ B . (λ t : B . (λ f : B . t))) [Nat] :: Nat -> Nat -> Nat
   
-  [enter command or λ-> expression]
+  [enter command or λ2 expression]
   λ2 >> :step
   (Λ B . (λ t : B . (λ f : B . t))) [Nat]
         (Λ B . (λ t : B . (λ f : B . t))) [Nat] :: Nat -> Nat -> Nat
   
-  [enter command or λ-> expression]
+  [enter command or λ2 expression]
   λ2 >> :step
   (λ t : Nat . (λ f : Nat . t))
         (λ t : Nat . (λ f : Nat . t)) :: Nat -> Nat -> Nat
   
-  [enter command or λ-> expression]
+  [enter command or λ2 expression]
   λ2 >> :applyto
   λ2 >> 23
         (λ t : Nat . (λ f : Nat . t)) 23 :: Nat -> Nat
   
-  [enter command or λ-> expression]
+  [enter command or λ2 expression]
   λ2 >> :step
   (λ f : Nat . 23)
         (λ f : Nat . 23) :: Nat -> Nat
   
-  [enter command or λ-> expression]
+  [enter command or λ2 expression]
   λ2 >> :applyto
   λ2 >> 42
         (λ f : Nat . 23) 42 :: Nat
   
-  [enter command or λ-> expression]
+  [enter command or λ2 expression]
   λ2 >> :step
   23
         23 :: Nat
