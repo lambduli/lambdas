@@ -11,9 +11,10 @@ data Expression
   | TypeAbstraction String Expression
   | Abstraction String T.Type Expression
   | Application Expression Expression
-  | TypeApplication Expression T.Type
+  | TypeApplication Expression Expression -- T.Type
+  | TypeArg T.Type
   | Natural Int
-  | Macro String
+  -- | Macro String
   | Operator String
   | Boolean Bool
 
@@ -24,9 +25,10 @@ instance Show Expression where
   show (Application left (Application rleft rright)) = "(" ++ show left ++ " (" ++ show rleft ++ " " ++ show rright ++ "))"
   show (Application left right) = show left ++ " " ++ show right
   
-  show (TypeApplication left right) = show left ++ " [" ++ show right ++ "]" -- may need parens around
+  show (TypeApplication left right) = show left ++ " " ++ show right -- may need parens around
+  show (TypeArg t) = "[" ++ show t ++ "]"
 
   show (Natural n) = show n
-  show (Macro str) = str
+  -- show (Macro str) = str
   show (Operator op) = op
   show (Boolean b) = show b

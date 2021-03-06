@@ -29,14 +29,10 @@ main = do
         let ast = fst $ last $ readP_to_S expression line
         execCommand ast
 
-  -- let ast = fst $ last $ readP_to_S expression line
-  -- execCommand ast
-
-
 execCommand :: Expression -> IO ()
 execCommand exp = do
   present'expr exp
-  putStrLn "[enter command or λ-> expression]"
+  putStrLn "[enter command or λ2 expression]"
   cmnd <- prompt "λ2 >> "
   case cmnd of
     ":step" -> do
@@ -57,47 +53,11 @@ execCommand exp = do
     ":applyto" -> do
       line <- prompt "λ2 >> "
       let ast = fst $ last $ readP_to_S expression line
-      execCommand $ Application exp ast
+      case ast of
+        TypeArg t -> execCommand $ TypeApplication exp ast
+        _ -> execCommand $ Application exp ast
     ":bye" -> return ()
     _ -> execCommand $ fst $ last $ readP_to_S expression cmnd
-
-
--- execCommand :: Expression -> IO ()
--- execCommand exp = do
---   cmnd <- prompt "[command or expression]:$ "
---   case cmnd of
---     ":step" -> do
---       let next = normalStep exp
---       putStr ":$ "
---       print next
---       execCommand next
---     ":normalize" -> do
---       let normal = normalize exp
---       putStr ":$ "
---       print normal
---       execCommand normal
---     ":new" -> main
---     ":print" -> do
---       print exp
---       execCommand exp
---     ":type" -> do
---       putStr ":: "
---       putStrLn $ unwrapType (typeOf exp)
---       execCommand exp
---     ":isnormal" -> do
---       print $ normalForm exp
---       execCommand exp
---     ":applyto" -> do
---       putStrLn "[enter λ2 expression]"
---       line <- prompt ":$ "
---       let ast = fst $ last $ readP_to_S expression line
---       execCommand $ Application exp ast
---     ":bye" -> return ()
---     ":freeTVar" -> do
---       print $ freeTVar exp
---       execCommand exp
---     _ -> execCommand $ fst $ last $ readP_to_S expression cmnd
-
 
 present'expr :: Expression -> IO ()
 present'expr expr = do
