@@ -87,7 +87,7 @@ typeAnnotation =
 --      | (EXP)
 -- TODO: need to expand
 
-typeParameter :: ReadP T.Type
+typeParameter :: ReadP AST.Expression
 typeParameter = do
   space <- skipSpaces
   l <- leftBracket
@@ -95,7 +95,7 @@ typeParameter = do
   t <- typeAnnotation
   space <- skipSpaces
   r <- rightBracket
-  return t
+  return $ AST.TypeArg t
 
 variable :: ReadP AST.Expression
 variable = do
@@ -109,15 +109,13 @@ natural' = do
   num <- natural
   case num of Natural int -> return $ AST.Natural int
 
-macro' :: ReadP AST.Expression
-macro' = do
+bool' :: ReadP AST.Expression
+bool' = do
   space <- skipSpaces
-  m <- macro
-  case m of
-    Macro "True" -> return $ AST.Boolean True
-    Macro "False" -> return $ AST.Boolean False
-    Macro str -> return $ AST.Macro str
-  -- case m of Macro str -> return $ AST.Macro str
+  b <- bool
+  case b of
+    Boolean True -> return $ AST.Boolean True
+    Boolean False -> return $ AST.Boolean False
 
 operator' :: ReadP AST.Expression
 operator' = do
@@ -127,39 +125,39 @@ operator' = do
 
 -- application :: ReadP AST.Expression
 -- application = do
---   left <- choice [wrapped, variable, operator', macro', natural', abstraction, typeAbstraction]
---   ids <- many1 $ choice [wrapped, variable, operator', macro', natural', abstraction, typeAbstraction]
+--   left <- choice [wrapped, variable, operator', bool', natural', abstraction, typeAbstraction]
+--   ids <- many1 $ choice [wrapped, variable, operator', bool', natural', abstraction, typeAbstraction]
 --   return $ foldl (\exp id -> AST.Application exp id) left ids
 
 -- typeApplication :: ReadP AST.Expression
 -- typeApplication = do
---   left <- choice [wrapped, variable, operator', macro', natural', abstraction, typeAbstraction]
+--   left <- choice [wrapped, variable, operator', bool', natural', abstraction, typeAbstraction]
 --   params <- many1 $ typeParameter
 --   return $ foldl (\exp par -> AST.TypeApplication exp par) left params
 
 
-data Argument
-  = Ex AST.Expression
-  | Tp T.Type
+-- data Argument
+--   = Ex AST.Expression
+--   | Tp T.Type
 
-wrap :: ReadP AST.Expression -> ReadP Argument
-wrap reader = do
-  ex <- reader
-  return $ Ex ex
+-- wrap :: ReadP AST.Expression -> ReadP Argument
+-- wrap reader = do
+--   ex <- reader
+--   return $ Ex ex
 
-wrap' :: ReadP T.Type -> ReadP Argument
-wrap' reader = do
-  tp <- reader
-  return $ Tp tp
+-- wrap' :: ReadP T.Type -> ReadP Argument
+-- wrap' reader = do
+--   tp <- reader
+--   return $ Tp tp
 
-makeApp :: AST.Expression -> Argument -> AST.Expression
-makeApp left (Ex ex) = AST.Application left ex
-makeApp left (Tp tp) = AST.TypeApplication left tp
+makeApp :: AST.Expression -> AST.Expression -> AST.Expression
+makeApp left r@(AST.TypeArg t) = AST.TypeApplication left r
+makeApp left r = AST.Application left r
 
 combinedApplication :: ReadP AST.Expression
 combinedApplication = do
-  left <- choice [wrapped, variable, operator', macro', natural', abstraction, typeAbstraction]
-  args <- many1 $ choice [wrap $ choice [wrapped, variable, operator', macro', natural', abstraction, typeAbstraction], wrap' typeParameter]
+  left <- choice [wrapped, variable, operator', bool', natural', abstraction, typeAbstraction]
+  args <- many1 $ choice [choice [wrapped, variable, operator', bool', natural', abstraction, typeAbstraction], typeParameter]
   return $ foldl makeApp left args
 
 abstraction :: ReadP AST.Expression
@@ -213,4 +211,4 @@ wrapped = do
 -- TODO: take care of exprs: (λ a : Nat -> Boolean, b : Boolean -> Char, c : Nat . b (a c))
 expression :: ReadP AST.Expression
 expression =  
-  choice [variable, natural', macro', operator', combinedApplication, abstraction, typeAbstraction, wrapped]
+  choice [variable, natural', bool', operator', combinedApplication, abstraction, typeAbstraction, wrapped, typeParameter]

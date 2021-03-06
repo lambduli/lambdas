@@ -47,7 +47,7 @@ normalStep tree =
   case tree of
     TypeAbstraction arg exp -> TypeAbstraction arg $ normalStep exp
 
-    TypeApplication (TypeAbstraction arg exp) rightT -> typeBeta arg rightT $ typeTAlpha arg (freeTTVar rightT) exp
+    TypeApplication (TypeAbstraction arg exp) (TypeArg rightT) -> typeBeta arg rightT $ typeTAlpha arg (freeTTVar rightT) exp
 
     TypeApplication left right ->
       TypeApplication (normalStep left) right
@@ -113,7 +113,7 @@ freeTVar = freeTVar' [] [] where
   freeTVar' bound free tree =
     case tree of
       Application left right -> (freeTVar' bound free left) ++ (freeTVar' bound free right) -- duplicities may occur
-      TypeApplication left t -> (freeTVar' bound free left) ++ (freeTVar'' bound free t)
+      TypeApplication left (TypeArg t) -> (freeTVar' bound free left) ++ (freeTVar'' bound free t)
       Abstraction arg t body -> (freeTVar'' bound free t) ++ (freeTVar' bound free body)
       TypeAbstraction par exp -> freeTVar' (par : bound) free exp
       _ -> free
@@ -248,7 +248,7 @@ typeBeta arg t target =
       if arg == p
         then target
         else TypeAbstraction p $ betaCurr exp
-    TypeApplication exp t' -> TypeApplication (betaCurr exp) $ T.substituteType arg t t'
+    TypeApplication exp (TypeArg t') -> TypeApplication (betaCurr exp) $ TypeArg $ T.substituteType arg t t'
     _ -> target
 
 -- ["=", "+", "-", "*", "/", "%", "^", ">=", "<=", "&&", "||"]

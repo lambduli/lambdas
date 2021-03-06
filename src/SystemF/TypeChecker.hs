@@ -57,7 +57,6 @@ typeOf' :: Expression -> Context -> Context -> Either T.Type String
 typeOf' (Natural n) _ _ = Left T.Nat
 typeOf' (Boolean b) _ _ = Left T.Boolean
 typeOf' (Operator op) _ _ = typeOfTerm op
-typeOf' (Macro t) _ _ = typeOfTerm t
 typeOf' (Variable v) termCtx _ = getType v termCtx
 
 typeOf' (Abstraction arg t body) termCtx typeCtx =
@@ -84,7 +83,7 @@ typeOf' (Application left right) termCtx typeCtx =
           Right e -> Right e
           _ -> Right $ "APP Type mismatch in: " ++ present lt ++ " applied to " ++ show right ++ ":" ++ present rt ++ "."
 
-typeOf' (TypeApplication (TypeAbstraction par exp) type') termCtx typeCtx =
+typeOf' (TypeApplication (TypeAbstraction par exp) (TypeArg type')) termCtx typeCtx =
   let
     t' = specify type' typeCtx -- pokud bude [Nat -> A] Expression pujde misto specify volat typeOf' type' termCtx TypeCtx
     newTypeCtx = addType par t' typeCtx
@@ -92,7 +91,7 @@ typeOf' (TypeApplication (TypeAbstraction par exp) type') termCtx typeCtx =
     typeOf' exp termCtx newTypeCtx -- TYAPP (Urcite forall A . T) (Urcite T') -- pokud T neexistuje - neexistuje typ TYAPP
 
 -- Otazka - Pouzije se vubec nekdy tohle? Jak muze byt TYAPP kdyz jeji left neni TYABS
-typeOf' (TypeApplication term type') termCtx typeCtx =
+typeOf' (TypeApplication term (TypeArg type')) termCtx typeCtx =
   let termT = typeOf' term termCtx typeCtx
       specified = specify type' typeCtx in
         case termT of
@@ -128,12 +127,11 @@ replaceFTVar old new exp =
 
     Application left right -> Application (replaceFTVar old new left) (replaceFTVar old new right)
 
-    TypeApplication exp t -> TypeApplication (replaceFTVar old new exp) (T.substituteType old (T.Parameter new) t)
+    TypeApplication exp (TypeArg t) -> TypeApplication (replaceFTVar old new exp) $ TypeArg (T.substituteType old (T.Parameter new) t)
 
     _ -> exp
     -- Variable String
     -- Natural Int
-    -- Macro String
     -- Operator String
     -- Boolean Bool
 

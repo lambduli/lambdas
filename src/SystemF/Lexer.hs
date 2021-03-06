@@ -102,11 +102,10 @@ natural = do
   digits <- munch1 isDigit
   return $ Natural $ read digits
 
-macro :: ReadP Token
-macro = do
-  start <- munch1 isUpper
-  end <- munch isLower
-  return $ Macro $ start ++ end
+bool :: ReadP Token
+bool = do
+  b <- choice [string "True", string "False"]
+  return $ Boolean $ read b
 
 colon :: ReadP Token
 colon = do
@@ -125,4 +124,4 @@ forall = do
 
 lexer :: ReadP [Token]
 lexer =
-  sepBy (choice [macro, operator, natural, var, typeVar, fnLambda, tpLambda, leftParen, rightParen, dot, forall]) skipSpaces
+  sepBy (choice [bool, operator, natural, var, typeVar, fnLambda, tpLambda, leftParen, rightParen, dot, forall]) skipSpaces
