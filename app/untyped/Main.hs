@@ -9,6 +9,7 @@ import Untyped.Evaluator (normalize, normalStep, normalForm)
 
 main :: IO ()
 main = do
+  putStrLn "Welcome to the Untyped λ calculus REPL"
   putStrLn "[enter λ expression]"
   line <- prompt ":$ "
   let ast = fst $ last $ readP_to_S expression line
