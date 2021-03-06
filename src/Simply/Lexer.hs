@@ -89,15 +89,10 @@ number = do
   digits <- munch1 isDigit
   return $ Natural $ read digits
 
-isMacro :: Char -> Bool
-isMacro char =
-  char >= 'A' && char <= 'Z'
-
-macro :: ReadP Token
-macro = do
-  start <- munch1 isMacro
-  end <- munch isLetter
-  return $ Macro $ start ++ end
+bool :: ReadP Token
+bool = do
+  b <- choice [string "True", string "True"]
+  return $ Boolean $ read b
 
 colon :: ReadP Token
 colon = do
@@ -111,4 +106,4 @@ arr = do
 
 lexer :: ReadP [Token]
 lexer =
-  sepBy (choice [macro, operator, number, varName, lambda, leftParen, rightParen, dot]) skipSpaces
+  sepBy (choice [bool, operator, number, varName, lambda, leftParen, rightParen, dot]) skipSpaces
